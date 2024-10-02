@@ -30,7 +30,6 @@ public class UserMealsUtil {
 
     public static List<UserMealWithExcess> filteredByCycles(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesByDateMap = new HashMap<>();
-
         for (UserMeal userMeal : meals) {
             LocalDate date = userMeal.getDateTime().toLocalDate();
             int calories = caloriesByDateMap.getOrDefault(date, 0) + userMeal.getCalories();
@@ -38,15 +37,11 @@ public class UserMealsUtil {
         }
 
         List<UserMealWithExcess> filteredList = new ArrayList<>();
-
         for (UserMeal userMeal : meals) {
             LocalDateTime dateTime = userMeal.getDateTime();
-            LocalTime time = dateTime.toLocalTime();
-
-            if (TimeUtil.isBetweenHalfOpen(time, startTime, endTime)) {
-                LocalDate date = dateTime.toLocalDate();
-                boolean excess = caloriesByDateMap.get(date) > caloriesPerDay;
-                UserMealWithExcess userMealWithExcess = new UserMealWithExcess(userMeal.getDateTime(),
+            if (TimeUtil.isBetweenHalfOpen(dateTime.toLocalTime(), startTime, endTime)) {
+                boolean excess = caloriesByDateMap.get(dateTime.toLocalDate()) > caloriesPerDay;
+                UserMealWithExcess userMealWithExcess = new UserMealWithExcess(dateTime,
                         userMeal.getDescription(), userMeal.getCalories(), excess);
                 filteredList.add(userMealWithExcess);
             }
@@ -64,8 +59,7 @@ public class UserMealsUtil {
         return meals.stream()
                 .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
                 .map(meal -> {
-                    LocalDate date = meal.getDateTime().toLocalDate();
-                    boolean excess = caloriesByDateMap.get(date) > caloriesPerDay;
+                    boolean excess = caloriesByDateMap.get(meal.getDateTime().toLocalDate()) > caloriesPerDay;
                     return new UserMealWithExcess(
                             meal.getDateTime(),
                             meal.getDescription(),
